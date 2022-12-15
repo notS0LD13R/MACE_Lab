@@ -1,22 +1,24 @@
 class Node:
-    def __init__(self,value=None,freq=0,children={},parent=None) -> None:
+    def __init__(self,value=None,freq=0,children={},parent=None,level=0) -> None:
         self.value=value
+        self.level=level
         self.freq=freq
         self.children=children
         self.parent=parent
     
     def __str__(self) -> str:
-        temp="\n".join([str(x) for x in self.children.values()])
-        childstr=" ".join(self.children.keys())
-        return str(self.value)+":"+childstr+"\n"+temp
+        childstr=" ".join(map(str,self.children.values()))
+        return (self.level * "       " )+("{"+str(self.value)+","+str(self.freq)+"}")+"\n"+childstr
     
     def assign(self,item_set:list):
-        if not item_set:return
+        if not item_set:
+            self.freq+=1
+            return
         
         #print(self.value,"=>",self.children.keys(),"||",item_set)
         self.freq+=1
         if item_set[0] not in self.children:
-            self.children[item_set[0]]= Node(value=item_set[0],freq=0,parent=self,children={})        
+            self.children[item_set[0]]= Node(value=item_set[0],parent=self,children={},level=self.level+1)        
         self.children[item_set[0]].assign(item_set[1:])
 
         
