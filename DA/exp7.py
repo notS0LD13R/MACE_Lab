@@ -1,3 +1,5 @@
+from collections import Counter
+
 class Node:
     def __init__(self,value=None,freq=0,children={},parent=None,level=0) -> None:
         self.value=value
@@ -29,11 +31,20 @@ class FPTree:
         self.root=root
         self.items=items
         self.pattbase={}
+        self.condfp={}
+        self.freqpatt={}
         for item in items:
             self.pattbase[item]=\
                 self.pattern_base_gen(self.root,item)
+            self.freqpatt[item]=\
+                self.cond_fptree_gen(self.pattbase[item])
             print(item,':-',self.pattbase[item])
-        
+    
+    def cond_fptree_gen(self,pattbase :dict)->list:
+        pool=[]
+        for patt in pattbase.items():
+            pass
+        pass
         
 
     def pattern_base_gen(self,root :Node,item :str) ->list:
