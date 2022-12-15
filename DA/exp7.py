@@ -1,4 +1,5 @@
 from collections import Counter
+from itertools import combinations
 
 class Node:
     def __init__(self,value=None,freq=0,children={},parent=None,level=0) -> None:
@@ -27,27 +28,53 @@ class Node:
 
 
 class FPTree:
+    min_supp=None
     def __init__(self,root :Node,items :list,min_supp=2):
         self.root=root
         self.items=items
-        self.min_supp=min_supp
+        FPTree.min_supp=min_supp
         self.pattbase={}
-        self.freqpatt={}
         self.condfp={}
+        self.freqpatt={}
         for item in items:
             self.pattbase[item]=\
                 self.pattern_base_gen(self.root,item)
             #print(item,':-',self.pattbase[item])
             
-            self.freqpatt[item]=\
+            self.condfp[item]=\
                 self.cond_fptree_gen(self.pattbase[item])
-            #print(item,':-',self.freqpatt[item])
+            #print(item,':-',self.condfp[item])
+
+            self.freqpatt[item]=\
+                self.freq_patt_gen(self.condfp[item],item)
+            #print(item,':-',self.freqpatt[item])    
     
+    def display(self):
+
+    
+    def min_freq(self,items :list,freq :dict)->int:
+        return min([freq[x] for x in items])
+    
+    def freq_patt_gen(self,condfp :Counter,curr :str)->list:
+        if not condfp:
+            return []
+        items=condfp.keys()
+        freqpatt=[]
+        for i in range(1,len(items)+1):
+            for j in combinations(items,i):
+                freqpatt.append({'items':j+(curr,),'freq':self.min_freq(j,condfp)})
+        return freqpatt
+
+
     def cond_fptree_gen(self,pattbase :dict)->Counter:
         pool=[]
         for patt in pattbase:
            pool.extend(patt['items']*patt['freq']) 
+        
         pool=Counter(pool)
+        for i in list(pool.keys()):
+            if pool[i]<FPTree.min_supp:del pool[i]
+        
         return pool
         
         
