@@ -27,24 +27,29 @@ class Node:
 
 
 class FPTree:
-    def __init__(self,root :Node,items :list):
+    def __init__(self,root :Node,items :list,min_supp=2):
         self.root=root
         self.items=items
+        self.min_supp=min_supp
         self.pattbase={}
-        self.condfp={}
         self.freqpatt={}
+        self.condfp={}
         for item in items:
             self.pattbase[item]=\
                 self.pattern_base_gen(self.root,item)
+            #print(item,':-',self.pattbase[item])
+            
             self.freqpatt[item]=\
                 self.cond_fptree_gen(self.pattbase[item])
-            print(item,':-',self.pattbase[item])
+            #print(item,':-',self.freqpatt[item])
     
-    def cond_fptree_gen(self,pattbase :dict)->list:
+    def cond_fptree_gen(self,pattbase :dict)->Counter:
         pool=[]
-        for patt in pattbase.items():
-            pass
-        pass
+        for patt in pattbase:
+           pool.extend(patt['items']*patt['freq']) 
+        pool=Counter(pool)
+        return pool
+        
         
 
     def pattern_base_gen(self,root :Node,item :str) ->list:
