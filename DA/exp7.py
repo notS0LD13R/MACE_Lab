@@ -36,7 +36,7 @@ class FPTree:
         self.pattbase={}
         self.condfp={}
         self.freqpatt={}
-        for item in items:
+        for item in self.items:
             self.pattbase[item]=\
                 self.pattern_base_gen(self.root,item)
             #print(item,':-',self.pattbase[item])
@@ -47,11 +47,23 @@ class FPTree:
 
             self.freqpatt[item]=\
                 self.freq_patt_gen(self.condfp[item],item)
-            #print(item,':-',self.freqpatt[item])    
-    
-    def display(self):
+            #print(item,':-',self.freqpatt[item]) 
+        self.display()   
 
-    
+    def display(self):
+        print("{: <4}|{: ^50}|{: ^50}".format("item","Conditional Pattern Base","Frequent Patterns Generated"))
+        print('-'*100)
+        for item in self.items:
+            cpline=""
+            fpline=""
+            for i in self.pattbase[item]:
+                cpline+=\
+                '{'+str(i['items'])+":"+str(i['freq'])+"}"+","
+            for i in self.freqpatt[item]:
+                fpline+=\
+                '{'+str(i['items'])+":"+str(i['freq'])+"}"+"," 
+            print(f"{item: <4}|{cpline: ^50}|{fpline: ^50}")
+
     def min_freq(self,items :list,freq :dict)->int:
         return min([freq[x] for x in items])
     
@@ -99,8 +111,11 @@ class FPTree:
 
 
 
-fp=open("exp7.txt")
-
+try:
+    fp=open("exp7.txt")
+except:
+    print("File not found")
+    exit()
 
 
 #Loading values from file to transaction dictionary
