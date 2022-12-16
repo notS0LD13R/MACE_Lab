@@ -11,7 +11,9 @@ class Node:
     
     def __str__(self) -> str:
         childstr=" ".join(map(str,self.children.values()))
-        return (self.level * "       " )+\
+        corner=u"\u2514"
+        line=u"\u2500"*6
+        return  (self.level * "     " )+corner+\
             ("{"+str(self.value)+","+str(self.freq)+"}")+\
             "\n"+childstr
     
@@ -51,18 +53,22 @@ class FPTree:
         self.display()   
 
     def display(self):
-        print("{: <4}|{: ^50}|{: ^50}".format("item","Conditional Pattern Base","Frequent Patterns Generated"))
+        print("{: <4}|{: ^50}|{: ^25}|{: ^50}".format("item","Conditional Pattern Base","Conditional FP-tree","Frequent Patterns Generated"))
         print('-'*100)
         for item in self.items:
             cpline=""
+            cfpline=""
             fpline=""
             for i in self.pattbase[item]:
                 cpline+=\
                 '{'+str(i['items'])+":"+str(i['freq'])+"}"+","
+
+            cfpline=str(self.condfp[item])[6:]
+
             for i in self.freqpatt[item]:
                 fpline+=\
                 '{'+str(i['items'])+":"+str(i['freq'])+"}"+"," 
-            print(f"{item: <4}|{cpline: ^50}|{fpline: ^50}")
+            print(f"{item: <4}|{cpline: ^50}|{cfpline: ^25}|{fpline: ^50}")
 
     def min_freq(self,items :list,freq :dict)->int:
         return min([freq[x] for x in items])
@@ -146,8 +152,8 @@ for i in transactions:
 
 
 
-print(item_freq)
-print(transactions)
+#print(item_freq)
+#print(transactions)
 
 print(root)
 
