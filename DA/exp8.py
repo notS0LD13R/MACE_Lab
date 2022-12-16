@@ -59,7 +59,7 @@ class DecTree:
             top_count=len((data[data[attr]<=split_point]))
             bottom_count=len((data[data[attr]>split_point]))
             for c_elem in data[DecTree.c_attr].unique():
-                p=len(data[data[DecTree.c_attr]==c_elem and data[attr]<split_point])/
+                p=len(data[data[DecTree.c_attr]==c_elem and data[attr]<split_point])/1
         return info
 
 
