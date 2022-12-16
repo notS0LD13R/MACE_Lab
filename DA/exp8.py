@@ -5,7 +5,7 @@ import sys
 
 def log2(x :float)->float:
     if x==0:
-        print("log 0")
+        #print("log 0")
         return 0
         
     else:
@@ -14,12 +14,21 @@ def log2(x :float)->float:
 class DecTree:
     c_attr=None
     def __init__(self,data,class_attr):
-        self.columns=data.columns
+        print(data)
+        self.columns=list(data.columns)
         DecTree.c_attr=class_attr
         self.attr=self.get_attr(data)
+        print("Current node attribute:",self.attr)
         self.children={}
+        if self.attr[0] in self.columns:
+            self.set_attr(data)
+
     
-    def get_attr(self,data):
+    def get_attr(self,data :pd.DataFrame)->list:
+        if len(data[DecTree.c_attr].unique())==1:
+            return data[DecTree.c_attr].unique()
+        if len(self.columns)==1:
+            return list(data[DecTree.c_attr])[0]
         info_gain={}
         entropy=0
         for c_elem in data[DecTree.c_attr].unique():
@@ -39,9 +48,25 @@ class DecTree:
                 info_gain[i][-1]+=entropy
         
         max_gain_attr=max(info_gain,key=lambda x:info_gain[x][-1])
-        print(info_gain,max_gain_attr)
-    
 
+        return [max_gain_attr] if len(info_gain[max_gain_attr])==1 else [max_gain_attr,info_gain[max_gain_attr][0]]
+        
+    def set_attr(self,data :pd.DataFrame):
+        #print(data.dtypes[self.attr[0]])
+        remaining_columns=self.columns
+        remaining_columns.remove(self.attr[0])
+        
+        if data.dtypes[self.attr[0]] in ['int64','float64']:
+            self.children['<=']=DecTree(data.loc[data[self.attr[0]]<=self.attr[1],remaining_columns],DecTree.c_attr)
+            self.children['>']=DecTree(data.loc[data[self.attr[0]]>self.attr[1],remaining_columns],DecTree.c_attr)
+        else:
+            #print("set_attr",data.loc[data[self.attr[0]]==i,remaining_columns])
+            for i in data[self.attr[0]].unique():
+                self.children[i]=DecTree(data.loc[data[self.attr[0]]==i,remaining_columns],DecTree.c_attr)
+
+        
+    
+    
     def nominal_gain(self,data :pd.DataFrame,attr :str)->list:
         row_count=len(data)
         info=0
@@ -65,7 +90,7 @@ class DecTree:
         row_count=len(data)
         for i in range(len(values)-1):
             midpoints.append((values[i]+values[i+1])/2)
-        print(midpoints)
+        #print(midpoints)
 
         for split_point in midpoints:
             top_count=len((data[data[attr]<=split_point]))
@@ -89,5 +114,5 @@ class DecTree:
 
 
 data=pd.read_csv("exp8.csv")
-#print(data[data['INCOME']=='HIGH'])
+
 DecTree(data,'BUY')
