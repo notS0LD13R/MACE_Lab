@@ -13,22 +13,33 @@ def log2(x :float)->float:
 
 class DecTree:
     c_attr=None
-    def __init__(self,data,class_attr):
-        print(data)
+    def __init__(self,data,class_attr,level=0):
+        
         self.columns=list(data.columns)
         DecTree.c_attr=class_attr
         self.attr=self.get_attr(data)
-        print("Current node attribute:",self.attr)
         self.children={}
+        self.level=level
+        
+        print(data)
+        print("Current node attribute:",self.attr)
         if self.attr[0] in self.columns:
             self.set_attr(data)
+        
+    def __str__(self):
+        childstr=" ".join(map(str,self.children.values()))
+        corner=u"\u2514"
+        line=u"\u2502"
+        return  (self.level * "     " )+corner+\
+            str(self.attr)+\
+                (f"{str(list(self.children.keys()))}" if self.children.keys() else "<Leaf>" )+\
+            "\n"+childstr
 
-    
     def get_attr(self,data :pd.DataFrame)->list:
         if len(data[DecTree.c_attr].unique())==1:
             return data[DecTree.c_attr].unique()
         if len(self.columns)==1:
-            return list(data[DecTree.c_attr])[0]
+            return list(data[DecTree.c_attr])[:1]
         info_gain={}
         entropy=0
         for c_elem in data[DecTree.c_attr].unique():
@@ -57,12 +68,12 @@ class DecTree:
         remaining_columns.remove(self.attr[0])
         
         if data.dtypes[self.attr[0]] in ['int64','float64']:
-            self.children['<=']=DecTree(data.loc[data[self.attr[0]]<=self.attr[1],remaining_columns],DecTree.c_attr)
-            self.children['>']=DecTree(data.loc[data[self.attr[0]]>self.attr[1],remaining_columns],DecTree.c_attr)
+            self.children['<=']=DecTree(data.loc[data[self.attr[0]]<=self.attr[1],remaining_columns],DecTree.c_attr,self.level+1)
+            self.children['>']=DecTree(data.loc[data[self.attr[0]]>self.attr[1],remaining_columns],DecTree.c_attr,self.level+1)
         else:
             #print("set_attr",data.loc[data[self.attr[0]]==i,remaining_columns])
             for i in data[self.attr[0]].unique():
-                self.children[i]=DecTree(data.loc[data[self.attr[0]]==i,remaining_columns],DecTree.c_attr)
+                self.children[i]=DecTree(data.loc[data[self.attr[0]]==i,remaining_columns],DecTree.c_attr,self.level+1)
 
         
     
@@ -115,4 +126,4 @@ class DecTree:
 
 data=pd.read_csv("exp8.csv")
 
-DecTree(data,'BUY')
+print(DecTree(data,'BUY'))
