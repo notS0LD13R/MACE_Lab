@@ -1,6 +1,7 @@
 from collections import Counter
 from itertools import combinations
 
+
 class Node:
     def __init__(self,value=None,freq=0,children={},parent=None,level=0) -> None:
         self.value=value
@@ -8,24 +9,27 @@ class Node:
         self.freq=freq
         self.children=children
         self.parent=parent
-    
+    #recursive tree printing
     def __str__(self) -> str:
-        childstr=" ".join(map(str,self.children.values()))
+        childstr="".join(map(str,self.children.values()))
         corner=u"\u2514"
-        line=u"\u2500"*6
-        return  (self.level * "     " )+corner+\
+        line=u"\u2502"
+        return  (self.level * ("     ") )+corner+\
             ("{"+str(self.value)+","+str(self.freq)+"}")+\
             "\n"+childstr
-    
+    #Assigning children to current node based on item set
     def assign(self,item_set:list):
+        #for leaf nodes freq to be incremented
         if not item_set:
             self.freq+=1
             return
         
         self.freq+=1
+        #if the nodes already a child then skip the creation of new node
         if item_set[0] not in self.children:
             self.children[item_set[0]]= \
             Node(value=item_set[0],parent=self,children={},level=self.level+1)        
+        #recursive call to assign children to child of current node
         self.children[item_set[0]].assign(item_set[1:])
 
 
@@ -38,6 +42,10 @@ class FPTree:
         self.pattbase={}
         self.condfp={}
         self.freqpatt={}
+        
+        #Finding conditonal pattern Base
+        #Conditional FP Tree Frequent Patterns
+        #for each item
         for item in self.items:
             self.pattbase[item]=\
                 self.pattern_base_gen(self.root,item)
@@ -50,6 +58,7 @@ class FPTree:
             self.freqpatt[item]=\
                 self.freq_patt_gen(self.condfp[item],item)
             #print(item,':-',self.freqpatt[item]) 
+        
         self.display()   
 
     def display(self):
@@ -63,16 +72,21 @@ class FPTree:
                 cpline+=\
                 '{'+str(i['items'])+":"+str(i['freq'])+"}"+","
 
-            cfpline=str(self.condfp[item])[6:]
+            cfpline=str(self.condfp[item])[7:]
 
             for i in self.freqpatt[item]:
                 fpline+=\
                 '{'+str(i['items'])+":"+str(i['freq'])+"}"+"," 
             print(f"{item: <4}|{cpline: ^50}|{cfpline: ^25}|{fpline: ^50}")
 
+    #Used for finding the item with least frequency from a dict
     def min_freq(self,items :list,freq :dict)->int:
         return min([freq[x] for x in items])
     
+    #Taking a counter(item and its freq dict) and
+    #finding all combinations of items and adding the 
+    #corresponding item set to its end
+    #eg i1 i2 i3 for i5 gives i1i5,i2i5,i3i5,i1i2i5,i1i3i5 .....
     def freq_patt_gen(self,condfp :Counter,curr :str)->list:
         if not condfp:
             return []
@@ -83,20 +97,26 @@ class FPTree:
                 freqpatt.append({'items':j+(curr,),'freq':self.min_freq(j,condfp)})
         return freqpatt
 
-
+    #Pooling the total number of items in each set into one big pool
+    #then getting the frequencies of each item in pool
     def cond_fptree_gen(self,pattbase :dict)->Counter:
         pool=[]
         for patt in pattbase:
            pool.extend(patt['items']*patt['freq']) 
         
         pool=Counter(pool)
+        
+        #Excluding elements with freq<minimum suppourt
         for i in list(pool.keys()):
             if pool[i]<FPTree.min_supp:del pool[i]
         
         return pool
         
         
-
+    #Starting at root and going down the tree
+    #to specified item node
+    #Then from the node moving up to its parents until null/root is reached
+    #returning all the nodes it went through as a list
     def pattern_base_gen(self,root :Node,item :str) ->list:
         if root.value==item:
             patterns={'items':[],'freq':root.freq}
@@ -149,11 +169,6 @@ for i in transactions:
     root.assign(transactions[i])
 
 
-
-
-
-#print(item_freq)
-#print(transactions)
 
 print(root)
 
