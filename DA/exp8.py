@@ -23,30 +23,51 @@ class DecTree:
         
         print(data)
         print("Current node attribute:",self.attr)
+        
         if self.attr[0] in self.columns:
             self.set_attr(data)
         
     def __str__(self):
-        childstr=" ".join(map(str,self.children.values()))
+        childstr="".join(map(str,self.children.values()))
         corner=u"\u2514"
         line=u"\u2502"
-        return  (self.level * "     " )+corner+\
+        return  (self.level * ("     ") )+corner+\
             str(self.attr)+\
                 (f"{str(list(self.children.keys()))}" if self.children.keys() else "<Leaf>" )+\
             "\n"+childstr
-
+    
+    #Method that finds info gain of all attributes and decides on
+    #the best attribute   
     def get_attr(self,data :pd.DataFrame)->list:
+        #Only one value for class attr 
+        # that means the current node is a leaf node
         if len(data[DecTree.c_attr].unique())==1:
             return data[DecTree.c_attr].unique()
+        
+        #Some rare condition(maybe not so rare) 
+        #where only one column left and the class attr
+        #is not properly spread(confusing right check the eg)
+        #attr class
+        #HIGH YES
+        #HIGH NO
+        #here high has both no and yes and no remaining
+        #columns to make the split so just choose the first class value
+
         if len(self.columns)==1:
             return list(data[DecTree.c_attr])[:1]
+
+        #dict for storing info gain of each column    
         info_gain={}
         entropy=0
+        
+        #finding entropy
         for c_elem in data[DecTree.c_attr].unique():
             p=len(data[data[DecTree.c_attr]==c_elem])/len(data)
             entropy-=p*log2(p)
             
-        
+        #actual info gain finding part
+        #split into two parts via ifelse
+        #for numerical and nominal
         for i in self.columns:
             if i==DecTree.c_attr:
                 #Bruh you dont need the info of the class attr
@@ -58,26 +79,32 @@ class DecTree:
                 info_gain[i]=self.nominal_gain(data,i)
                 info_gain[i][-1]+=entropy
         
-        max_gain_attr=max(info_gain,key=lambda x:info_gain[x][-1])
 
+        max_gain_attr=max(info_gain,key=lambda x:info_gain[x][-1])
+        #      Nominal                                                  Numerical
         return [max_gain_attr] if len(info_gain[max_gain_attr])==1 else [max_gain_attr,info_gain[max_gain_attr][0]]
-        
+
+
+    #Assigning children to this node 
     def set_attr(self,data :pd.DataFrame):
         #print(data.dtypes[self.attr[0]])
         remaining_columns=self.columns
         remaining_columns.remove(self.attr[0])
         
+        #checking if attribute is continous
         if data.dtypes[self.attr[0]] in ['int64','float64']:
+            #top half data set to one child and bottom half to other
             self.children['<=']=DecTree(data.loc[data[self.attr[0]]<=self.attr[1],remaining_columns],DecTree.c_attr,self.level+1)
             self.children['>']=DecTree(data.loc[data[self.attr[0]]>self.attr[1],remaining_columns],DecTree.c_attr,self.level+1)
         else:
             #print("set_attr",data.loc[data[self.attr[0]]==i,remaining_columns])
+            #Splitting dataset based on class attrs value and creating new child for each partition
             for i in data[self.attr[0]].unique():
                 self.children[i]=DecTree(data.loc[data[self.attr[0]]==i,remaining_columns],DecTree.c_attr,self.level+1)
 
         
     
-    
+    #To find gain of an attr(nominal)
     def nominal_gain(self,data :pd.DataFrame,attr :str)->list:
         row_count=len(data)
         info=0
@@ -93,7 +120,7 @@ class DecTree:
         #print(info)
         return [info]    
                 
-        
+    #To find gain of an attr(numerical)    
     def numerical_gain(self,data :pd.DataFrame,attr :str)->list:
         info=[None,-sys.maxsize]
         values=sorted(list(data[attr]))
@@ -124,6 +151,6 @@ class DecTree:
         return info
 
 
-data=pd.read_csv("exp8.csv")
+data=pd.read_csv("exp81.csv")
 
-print(DecTree(data,'BUY'))
+print(DecTree(data,'Class'))
