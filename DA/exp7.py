@@ -166,6 +166,7 @@ root=Node(value='null')
 #Also adding the new list to fp growth tree via assign
 for i in transactions:
     transactions[i].sort(key=lambda x:item_freq[x] ,reverse=True)
+    print(transactions[i])
     root.assign(transactions[i])
 
 

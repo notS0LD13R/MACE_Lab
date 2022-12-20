@@ -151,6 +151,6 @@ class DecTree:
         return info
 
 
-data=pd.read_csv("exp81.csv")
+data=pd.read_csv("exp8.csv")
 
-print(DecTree(data,'Class'))
+print(DecTree(data,'BUY'))

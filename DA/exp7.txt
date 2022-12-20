@@ -1,9 +1,10 @@
-t100 i1 i2 i5
-t200 i2 i4
+t100 i1 i4 i5
+t200 i2 i4 i5
 t300 i2 i3
 t400 i1 i2 i4
-t500 i1 i3
+t500 i1 i4
 t600 i2 i3
 t700 i1 i3
 t800 i1 i2 i3 i5
 t900 i1 i2 i3
+t1000 i1 i2 i3 i5
