@@ -66,6 +66,9 @@ class Database:
 
         return data
 
+    def close(self):
+        self.conn.close()
+
     
 
 
