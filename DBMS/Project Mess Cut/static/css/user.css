@@ -1,0 +1,24 @@
+.grid-container{
+    display: grid;
+    grid-template-columns: repeat(7,1fr);
+    height: 500px;
+    width: 50vw;
+    gap:1rem;
+}
+
+.grid-child{
+    border: 5px solid grey;
+    border-radius: 1rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+}
+
+.grid-child.red{
+    border-color: red;
+}
+
+.grid-child.green{
+    border-color: greenyellow;
+}

@@ -69,12 +69,21 @@ class Database:
     def close(self):
         self.conn.close()
 
+    def getname(self,adm_no):
+        sql='select name from student where adm_no=%s'
+        val=[adm_no]
+
+        data=self.execute(sql,val)
+        return data[0][0]
+
     
 
 
 def main():
     obj=Database('root','root','mess_management')
-    obj.get_cuts('b20ds063')
+    print(obj.insert_student('11223344','joel',1))
+    print(obj.insert_student('11122233','rahul',2))
+    print(obj.insert_student('11112222','abdul',2))
 
 if __name__=='__main__':
     main()
