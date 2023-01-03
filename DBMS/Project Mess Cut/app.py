@@ -17,19 +17,20 @@ def login():
 @app.route('/auth',methods=['POST'])
 def auth():
     db=Database(db_user,db_pass,'mess_management')
-    
+    print(db.conn)
     adm_no=flk.request.form.get('user')
     password=flk.request.form.get('pass')
-    name = db.getname(adm_no)
+    name=db.getname(adm_no)
     status=db.authenticate(adm_no,password)
+    #need fixing authenticate auto closing the connection :(
     
     db.close()
     if status[0]:
         flk.session['user']=adm_no
         flk.session['name']=name
-
+        
         if status[1]:
-            return flk.render_template('admin.html')
+            return flk.redirect('/admin')
         else:
             return flk.redirect('/user')
     else:
@@ -60,7 +61,14 @@ def user():
 
     return flk.render_template('user.html',**content)
 
-    
+@app.route("/admin")
+def admin():
+    content={}
+    db=db=Database(db_user,db_pass,'mess_management')
+    content['student_list']=db.get_students()
+    db.close()
+    print(content)
+    return flk.render_template('admin.html',**content)
 
 
 if __name__=="__main__":
