@@ -9,8 +9,46 @@
 </head>
 <body>
     <main>
-        <section></section>
-        
+        <section>
+            <div>
+                <form action="{{url_for('admin_func')}}" method="post">
+                    <label for="cost">Enter the monthly mess fee:</label>
+                    <br><br>
+                    <input type="text" name="cost" id="cost" placeholder="Enter bill amount">
+                    <br><br>
+                    <input type="submit" name="messcost" value="Submit">
+                    <input type="submit" name ='reset' value="Reset Month">
+                </form>
+                <table>
+                    <tr>
+                        <th>Date</th>
+                        <th>Cost</th>
+                    </tr>
+                    {% for row in mess_cost %}
+                        <tr>
+                            {% for value in row %}
+                                <td>{{value}}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+                
+            <div>
+                <form action="{{url_for('admin_func')}}" method="post">
+                    <label for="name ">NAME</label>
+                    <input type="text" name="name" id="name" placeholder="Enter the name" required>
+                    <label for="adm_no">ADMNO</label>
+                    <input type="text" name="adm_no" id="adm_no" placeholder="Enter the admission no" required>
+                    <label for="hostel_id">HOSTEL</label>
+                    <input type="text" name="hostel_id" id="hostel_id" placeholder="Enter the hostel ID" required>
+                    
+                    <input type="submit" name ="student" value="Add Student">
+                </form>
+                <h4>{{insert_status}}</h4>
+            </div> 
+        </section>
+        <br>
             <section>
                 <table>
                     <tr>
@@ -26,7 +64,6 @@
                         </tr>
                     {% endfor %}
                 </table>
-            
             </section>
         
     </main>

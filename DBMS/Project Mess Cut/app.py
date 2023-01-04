@@ -17,7 +17,7 @@ def login():
 @app.route('/auth',methods=['POST'])
 def auth():
     db=Database(db_user,db_pass,'mess_management')
-    print(db.conn)
+    
     adm_no=flk.request.form.get('user')
     password=flk.request.form.get('pass')
     name=db.getname(adm_no)
@@ -61,14 +61,47 @@ def user():
 
     return flk.render_template('user.html',**content)
 
-@app.route("/admin")
+@app.route("/admin",methods=['POST','GET'])
 def admin():
-    content={}
+    content={'insert_status':flk.request.args.get('insert_status')}
     db=db=Database(db_user,db_pass,'mess_management')
     content['student_list']=db.get_students()
+    sql='select * from mess_cost order by date desc limit 5'
+    content['mess_cost']=db.execute(sql)
     db.close()
-    print(content)
+    
     return flk.render_template('admin.html',**content)
+
+@app.route("/admin_func",methods=['POST','GET'])
+def admin_func():
+    cost=flk.request.form.get('cost')
+    content={}
+    print(flk.request.method)
+    if flk.request.method=='POST':
+        form=flk.request.form
+        db=Database(db_user,db_pass,'mess_management')
+        print(form)
+        if 'messcost' in form:
+            db.set_mess_cost(cost)
+            db.calc_mess_bill()
+            
+        elif 'reset' in form:
+            db.monthly_reset()
+        
+        elif 'student' in form:
+            name=form.get('name')
+            adm_no=form.get('adm_no')
+            hostel_id=form.get('hostel_id')
+            
+            if ((1<=len(name)<=50) and (len(adm_no)==8)):
+                db.insert_student(adm_no,name,int(hostel_id))
+                content['insert_status']="Student inserted"
+            else:
+                content['insert_status']="Student detail invalid"
+        db.close()
+    return flk.redirect(flk.url_for("admin",**content))
+
+
 
 
 if __name__=="__main__":

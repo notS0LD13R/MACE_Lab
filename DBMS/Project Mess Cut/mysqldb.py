@@ -55,7 +55,7 @@ class Database:
         
         self.execute(sql)
     
-    def set_mess_cost(self,cost):
+    def set_mess_cost(self,cost:int):
         sql='call set_mess_cost(%s)'
         val=[cost]
 
@@ -78,9 +78,8 @@ class Database:
         return data[0][0] if data else None
     
     def execute(self, sql,val=None)->list:
-        print("checker1:",self.conn.is_connected())
+        print(sql,val)
         cur=self.conn.cursor()
-        print("checker2:",self.conn.is_connected())
         cur.execute(sql,val) if val else  cur.execute(sql)
         data=cur.fetchall()
         self.conn.commit() if not data else ()
